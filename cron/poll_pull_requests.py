@@ -24,7 +24,6 @@ def poll_pull_requests():
     # get all ready prs (disregarding of the voting window)
     prs = gh.prs.get_ready_prs(api, settings.URN, 0)
 
-    needs_update = False
     for pr in prs:
         pr_num = pr["number"]
         __log.info("processing PR #%d", pr_num)
@@ -73,8 +72,16 @@ def poll_pull_requests():
                 pr_owner = pr["user"]["login"]
                 gh.users.follow_user(api, pr_owner)
 
-                needs_update = True
-
+                # if we performed a merge, update and restart right away, to
+                # detect failures at merge-commit granularity.  before, we were
+                # updating and restarting only after we processed all ready PRs,
+                # which would make it difficult to detect which PR's changeset
+                # introduced breaking errors.
+                #
+                # also, notice we're just exiting nicely supervisor will see
+                # that the container exited and rebuild/re-launch the image
+                __log.info("updating code and requirements and restarting self")
+                exit(0)
         else:
             __log.info("PR %d status: will be rejected", pr_num)
 
@@ -117,12 +124,6 @@ def poll_pull_requests():
                 else:
                     old_votes[user] = 1
             json.dump(old_votes, fp)
-
-    # we approved a PR, restart
-    if needs_update:
-        __log.info("updating code and requirements and restarting self")
-        startup_path = join(THIS_DIR, "..", "startup.sh")
-        os.execl(startup_path, startup_path)
 
     __log.info("Waiting %d seconds until next scheduled PR polling event",
                settings.PULL_REQUEST_POLLING_INTERVAL_SECONDS)
