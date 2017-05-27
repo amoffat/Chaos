@@ -55,6 +55,8 @@ RUN rm /etc/nginx/sites-enabled/default
 
 ENV start_chaos=/usr/local/bin/start_chaos.sh
 
+# these are things we can only set up once our data volume (the repo code) has
+# been mounted to the container upon running
 RUN printf "\
     #!/bin/bash
     ln -sf $chaosdir/etc/chaos_supervisor.conf /etc/supervisor/conf.d/chaos.conf\n\
