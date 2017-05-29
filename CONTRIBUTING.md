@@ -2,6 +2,7 @@
 
 Once you open a pull request, ChaosBot will give it X seconds (where X is determined by github\_api.voting.get\_voting\_window) before collecting votes. During this time, you should let people know about your contribution, so that they may vote for it and ensure your hard work gets merged in. If you do not wish for ChaosBot to consider your PR for merging just yet, add "WIP" somewhere in your PR title. Remove it when you're ready for voting.
 
+awefawe
 # Changing your PR
 
 You may change your PR at any time without losing votes, but keep in mind, any new changes will reset the vote window for additional time.
